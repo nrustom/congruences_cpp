@@ -1,0 +1,1 @@
+g++ -march=native -Ofast -std=c++11 -c test.cpp ; g++ -march=native -Ofast -std=c++11 -o test *.cpp
