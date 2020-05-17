@@ -1,0 +1,7 @@
+uint64 t0, t1;
+t0 = time();
+cout << power(2, 4500, 7*7*7*7) << "\n";
+t1 = time();
+cout << " t = " << t1 - t0 << "\n";
+long n = 3768, k = 126, p = 7, m = 4, mod = power(p, m);
+cout << binomial_mod(n, k, p, m, mod) << "\n";

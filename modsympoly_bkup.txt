@@ -1,0 +1,357 @@
+#include <vector>
+#include <stdio.h>
+#include <sstream>
+#include <iostream>
+#include <stdexcept>
+#include "modsympoly.h"
+#include "int_mod.h"
+#include "arithmetic.h"
+#include "timer.h"
+
+bool admissible(int p, mod_sym_t ms){
+	bool check;
+	check = (0 <= ms.i and 0 <= ms.a and 0 <= ms.b and 0 <= ms.c and 0 <= ms.d);
+	check = check and (ms.a < p and ms.b < p and ms.c < p and ms.d < p);
+	check = check and ( (ms.a == 0 and ms.b == 1) or (ms.a == 1));
+	check = check and ( (ms.c == 0 and ms.d== 1 ) or (ms.c == 1));
+	check = check and (ms.a*ms.d - ms.b*ms.c)%p != 0;
+	return check;
+}
+
+mod_sym_t make_admissible(int p, mod_sym_t ms){
+	mod_sym_t new_ms;
+	exgcd_t gcd;
+	new_ms.a = rem(ms.a, p);
+	new_ms.b = rem(ms.b, p);
+	new_ms.c = rem(ms.c, p);
+	new_ms.d = rem(ms.d, p);
+	if (new_ms.a == 0) new_ms.b = 1;
+	if (new_ms.c == 0) new_ms.d = 1;
+	if (new_ms.a != 0){
+		gcd = xgcd(new_ms.a, p);
+		new_ms.a = 1;
+		new_ms.b *= gcd.s;
+		new_ms.b = rem(new_ms.b, p);
+	}
+	if (new_ms.c != 0){
+		gcd = xgcd(new_ms.c, p);
+		new_ms.c = 1;
+		new_ms.d *= gcd.s;
+		new_ms.d = rem(new_ms.d, p);
+	}
+	return new_ms;
+}
+
+int msp_index( int p, mod_sym_t ms){
+	int index = ms.i*(p*p + p);
+	if (admissible(p, ms) == false){
+		throw std::runtime_error("Inadmissible a,b,c,d!");
+	}
+	if (ms.a == 0 and ms.c == 1){
+		index += ms.d;
+	}
+	else if (ms.a == 1 and ms.c == 0){
+		index += p + ms.b;
+	}
+	else if (ms.a == 1 and ms.c == 1){
+		index += 2*p + ms.b*(p-1) + ms.d;
+		if (ms.d > ms.b) index -= 1;
+	}
+	return index;
+}
+
+mod_sym_t index_msp(int p, int index){
+	mod_sym_t ms;
+	int _t, t0;
+	ms.i = index / (p*p + p);
+	t0 = index - ms.i*(p*p + p);
+	if (t0 < p){
+		ms.a = 0;
+		ms.b = 1;
+		ms.c = 1;
+		ms.d = t0%p;
+	}
+	else if (p <= t0 and t0 < 2*p){
+		ms.a = 1;
+		ms.b = t0%p;
+		ms.c = 0;
+		ms.d = 1;
+	}
+	else if (2*p <= t0){
+		ms.a = 1;
+		ms.c = 1;
+		_t = t0 - 2*p;
+		ms.b = rem(rem(_t, p-1) - rem(_t, p), p);
+		if (ms.b < 0) ms.b += p;
+		ms.d = _t - ms.b*(p-1);
+		if (ms.d >= ms.b){
+			ms.d += 1;
+		}
+	}
+	return ms;
+}
+
+ModSymPoly::ModSymPoly(int p, int m, int w){
+	_p = p;
+	_m = m;
+	_modulus = power(p, m);
+	_w = w;
+	_size = (w+1)*(p*p + p);
+	_vector.reserve(_size);
+	int i;
+	for (i = 0; i < _size; i++){
+		_vector.push_back(IntegerMod(0, p, m));
+	}
+}
+
+ModSymPoly::ModSymPoly(int p, int m, int w, std::vector<IntegerMod> &v){
+	_p = p;
+	_m = m;
+	_modulus = power(p, m);
+	_vector = v;
+	_size = _vector.size();
+	_w = _size / (p*p + p) - 1;
+}
+
+ModSymPoly::ModSymPoly(int p, int m, int w, mod_sym_t ms){
+	_p = p;
+	_m = m;
+	_modulus = power(p, m);
+	_w = w;
+	_size = (w+1)*(p*p + p);
+	_vector.reserve(_size);
+	int index = msp_index(p, ms), i;
+	for (i = 0; i<_size; i++){
+		if (i==index){
+			_vector.push_back(IntegerMod(1, p, m));
+		}
+		else{
+			_vector.push_back(IntegerMod(0, p, m));
+		}
+	}
+}
+
+std::vector<IntegerMod> ModSymPoly::vector(){
+	return _vector;
+}
+
+int ModSymPoly::size(){
+	return this->_size;
+}
+
+int ModSymPoly::p(){
+	return this->_p;
+}
+
+int ModSymPoly::m(){
+	return this->_m;
+}
+
+int ModSymPoly::modulus(){
+	return this->_modulus;
+}
+
+int ModSymPoly::w(){
+	return this->_w;
+}
+
+std::string ModSymPoly::str(){
+	std::stringstream ss;
+	int index, n = this->size(), p=this->p(), w=this->w();
+	IntegerMod x;
+	mod_sym_t ms;
+	bool is_first = true;
+	for (index = 0; index < n;  index++){
+		ms = index_msp(p, index);
+		x = (*this)._vector[index];
+		//std::cout << x.str() << "\n";
+		if (x.lift() != 0){
+			if (!is_first) ss << " + ";
+			else is_first = false;
+			if (x.lift() != 1) ss << x.str() << "*";
+			if (ms.i != 0) ss << "X^" << ms.i;
+			if (ms.i != 0 and w-ms.i != 0) ss << "*Y^" << w-ms.i;
+			else if (w-ms.i != 0) ss << "Y^" << w-ms.i;
+			ss << "*[[" << ms.a << ", " << ms.b << "], [" << ms.c << ", " << ms.d << "]]";
+		}
+	}
+	if (ss.str() == "") ss << "0";
+	return ss.str();
+}
+
+std::string ModSymPoly::vec_str(){
+	std::stringstream ss;
+	int index, n = (*this)._size;
+	std::vector<IntegerMod> v = (*this)._vector;
+	ss << "(";
+	for (index = 0; index < n;  index++){
+		ss << v[index].str() << ",";
+		}
+	ss << ")";
+	return ss.str();
+}
+
+ModSymPoly operator+ (ModSymPoly x, ModSymPoly y){
+	std::vector<IntegerMod> ans, xv = x.vector();
+	ans = y.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = ans[i] + xv[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator- (ModSymPoly x, ModSymPoly y){
+	std::vector<IntegerMod> ans, xv = x.vector();
+	ans = y.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = ans[i] - xv[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly ModSymPoly::operator- (){
+	std::vector<IntegerMod> ans;
+	ans = (*this)._vector;
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = -ans[i];
+	}
+	return ModSymPoly((*this)._p, (*this)._m, (*this)._w, ans);
+}
+
+ModSymPoly operator* (ModSymPoly x, IntegerMod y){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (ModSymPoly x, int y){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (ModSymPoly x, long y){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (ModSymPoly x, long long y){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (IntegerMod y, ModSymPoly x){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (int y, ModSymPoly x){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (long y, ModSymPoly x){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly operator* (long long y, ModSymPoly x){
+	std::vector<IntegerMod> ans;
+	ans = x.vector();
+	unsigned int i;
+	for (i=0; i < ans.size(); i++){
+		ans[i] = y*ans[i];
+	}
+	return ModSymPoly(x.p(), x.m(), x.w(), ans);
+}
+
+ModSymPoly ModSymPoly::act(gl2_t mat){
+	uint64 t0, t1;
+	int a = mat.a, b = mat.b, c = mat.c, 
+		d = mat.d, p=(*this)._p, m=(*this)._m, 
+		w=(*this)._w, count;
+	int s, t, index, new_index;
+	mod_sym_t ms, new_ms;
+	std::vector<IntegerMod> vec = (*this)._vector, new_vec;
+	for (s = 0; s < (*this)._size; s++){
+		new_vec.push_back(IntegerMod(0, p, m));
+	}
+	IntegerMod x;
+	int bin1, bin2;
+	if ((a*d - b*c)%p == 0) throw std::runtime_error("Matrix not invertible modulo p!");
+	count = 0;
+	for (index = 0; index < (*this)._size; index++){
+		x = vec[index];
+		if (x.lift()== 0) continue;
+		ms = index_msp(p, index);
+		new_ms.a = ms.a*a + ms.b*c;
+		new_ms.b = ms.a*b + ms.b*d;
+		new_ms.c = ms.c*a + ms.d*c;
+		new_ms.d = ms.c*b + ms.d*d;
+		new_ms = make_admissible(p, new_ms);
+		for (s = 0; s <= ms.i; s++){
+			t0 = GetTimeMs64();
+			for (t = 0; t <= w - ms.i; t++){
+				new_ms.i = s + t;
+				new_index = msp_index(p, new_ms);
+				bin1 = binom_mod(ms.i, s, p, m);
+				if (bin1 == 0) continue;
+				bin2 = binom_mod(w - ms.i, t, p, m);
+				if (bin2 == 0) continue;
+				new_vec[new_index] = new_vec[new_index] 
+					+ x *bin1*bin2*power(a, s, p, m)*power(b, ms.i - s, p, m)
+						*power(c, t, p, m)*power(d,w-ms.i-t, p, m);		
+			}
+			t1 = GetTimeMs64();
+			if (t1-t0 > 0) std::cout << "T = " << t1 - t0 << "\n";	
+		}
+
+		count++;	
+	}
+	std::cout << "count = " << count << "\n";
+	return ModSymPoly(p, m, w, new_vec);
+}
+
+ModSymPoly ModSymPoly::sig_rel(){
+	return *this + (*this).act(GL2_SIG);
+}
+
+ModSymPoly ModSymPoly::tau_rel(){
+	return *this + (*this).act(GL2_TAU) + (*this).act(GL2_TAU_2);
+}

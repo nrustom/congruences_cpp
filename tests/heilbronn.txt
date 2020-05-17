@@ -1,0 +1,6 @@
+vector<gl2_t> HM = heilbronn_cremona(29);
+int i;
+for (i = 0; i < HM.size(); i++){
+	cout << HM[i].a <<","<<HM[i].b <<","<<HM[i].c <<","<<HM[i].d <<","<< "\n";
+}
+cout << "HM.size = " << HM.size() << "\n";

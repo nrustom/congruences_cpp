@@ -1,0 +1,241 @@
+int main(void){
+	int p = 5, m = 3;
+	int i, j;
+	vector<vector<IntegerMod> > A;
+	vector<int> pivots;
+
+
+	vector<IntegerMod> v0;
+	v0.push_back(IntegerMod(84, p, m));
+	v0.push_back(IntegerMod(60, p, m));
+	v0.push_back(IntegerMod(86, p, m));
+	v0.push_back(IntegerMod(70, p, m));
+	v0.push_back(IntegerMod(72, p, m));
+	v0.push_back(IntegerMod(7, p, m));
+	v0.push_back(IntegerMod(98, p, m));
+	v0.push_back(IntegerMod(84, p, m));
+	v0.push_back(IntegerMod(7, p, m));
+	v0.push_back(IntegerMod(103, p, m));
+	v0.push_back(IntegerMod(20, p, m));
+	/***
+	[  1  90   4 105 108  73  22   1  73  92  30]
+	***/
+	vector<IntegerMod> v1;
+	v1.push_back(IntegerMod(53, p, m));
+	v1.push_back(IntegerMod(23, p, m));
+	v1.push_back(IntegerMod(60, p, m));
+	v1.push_back(IntegerMod(86, p, m));
+	v1.push_back(IntegerMod(110, p, m));
+	v1.push_back(IntegerMod(20, p, m));
+	v1.push_back(IntegerMod(105, p, m));
+	v1.push_back(IntegerMod(76, p, m));
+	v1.push_back(IntegerMod(66, p, m));
+	v1.push_back(IntegerMod(71, p, m));
+	v1.push_back(IntegerMod(108, p, m));
+	/***
+	[  1   0  64 100  28  43 102  61  38 117 115]
+	[  0   1 116   7  87  92  63  91  24  65   6]
+	***/
+	vector<IntegerMod> v2;
+	v2.push_back(IntegerMod(48, p, m));
+	v2.push_back(IntegerMod(118, p, m));
+	v2.push_back(IntegerMod(55, p, m));
+	v2.push_back(IntegerMod(57, p, m));
+	v2.push_back(IntegerMod(30, p, m));
+	v2.push_back(IntegerMod(6, p, m));
+	v2.push_back(IntegerMod(65, p, m));
+	v2.push_back(IntegerMod(114, p, m));
+	v2.push_back(IntegerMod(5, p, m));
+	v2.push_back(IntegerMod(79, p, m));
+	v2.push_back(IntegerMod(104, p, m));
+	/***
+	[  1   0   4  17  93  45 122  22  81 118  22]
+	[  0   1   1   0  97  50  18  35 121  44  84]
+	[  0   0   5   9   5  54  40  72  36  27 114]
+	[  0   0   0  25   0  25   0  75 100  75  25]
+	***/
+	vector<IntegerMod> v3;
+	v3.push_back(IntegerMod(62, p, m));
+	v3.push_back(IntegerMod(90, p, m));
+	v3.push_back(IntegerMod(39, p, m));
+	v3.push_back(IntegerMod(50, p, m));
+	v3.push_back(IntegerMod(49, p, m));
+	v3.push_back(IntegerMod(94, p, m));
+	v3.push_back(IntegerMod(83, p, m));
+	v3.push_back(IntegerMod(50, p, m));
+	v3.push_back(IntegerMod(64, p, m));
+	v3.push_back(IntegerMod(118, p, m));
+	v3.push_back(IntegerMod(122, p, m));
+	/***
+	[  1   0   0   0  51  61  11  69  46  16 107]
+	[  0   1   0   0  29  87 124  32  18  10  62]
+	[  0   0   1   0  68  88  19   3 103  34  22]
+	[  0   0   0   1  60  96 105  48  44 123  56]
+	***/
+	vector<IntegerMod> v4;
+	v4.push_back(IntegerMod(11, p, m));
+	v4.push_back(IntegerMod(120, p, m));
+	v4.push_back(IntegerMod(21, p, m));
+	v4.push_back(IntegerMod(60, p, m));
+	v4.push_back(IntegerMod(11, p, m));
+	v4.push_back(IntegerMod(65, p, m));
+	v4.push_back(IntegerMod(99, p, m));
+	v4.push_back(IntegerMod(51, p, m));
+	v4.push_back(IntegerMod(114, p, m));
+	v4.push_back(IntegerMod(115, p, m));
+	v4.push_back(IntegerMod(48, p, m));
+	/***
+	[  1   0   0   0   0  98 114  92 111  81  80]
+	[  0   1   0   0   0  10  11  99  28  20  54]
+	[  0   0   1   0   0  54  73 117  23  79 111]
+	[  0   0   0   1   0  66  35  53  69  23  61]
+	[  0   0   0   0   1  63  47   2  60  60  52]
+	***/
+	vector<IntegerMod> v5;
+	v5.push_back(IntegerMod(70, p, m));
+	v5.push_back(IntegerMod(55, p, m));
+	v5.push_back(IntegerMod(99, p, m));
+	v5.push_back(IntegerMod(14, p, m));
+	v5.push_back(IntegerMod(57, p, m));
+	v5.push_back(IntegerMod(14, p, m));
+	v5.push_back(IntegerMod(99, p, m));
+	v5.push_back(IntegerMod(17, p, m));
+	v5.push_back(IntegerMod(46, p, m));
+	v5.push_back(IntegerMod(91, p, m));
+	v5.push_back(IntegerMod(14, p, m));
+	/***
+	[  1   0   0   0   0   0  16  44   8  68 123]
+	[  0   1   0   0   0   0   1  89  43  85  89]
+	[  0   0   1   0   0   0  19  88 104 105  25]
+	[  0   0   0   1   0   0  94  87  43  27  67]
+	[  0   0   0   0   1   0 109 114  92   7  35]
+	[  0   0   0   0   0   1   1  26  61 106  34]
+	***/
+	vector<IntegerMod> v6;
+	v6.push_back(IntegerMod(30, p, m));
+	v6.push_back(IntegerMod(6, p, m));
+	v6.push_back(IntegerMod(98, p, m));
+	v6.push_back(IntegerMod(119, p, m));
+	v6.push_back(IntegerMod(121, p, m));
+	v6.push_back(IntegerMod(104, p, m));
+	v6.push_back(IntegerMod(53, p, m));
+	v6.push_back(IntegerMod(100, p, m));
+	v6.push_back(IntegerMod(37, p, m));
+	v6.push_back(IntegerMod(123, p, m));
+	v6.push_back(IntegerMod(40, p, m));
+	/***
+	[  1   0   0   0   0   0   0  58  94  34 121]
+	[  0   1   0   0   0   0   0  43  64  36  42]
+	[  0   0   1   0   0   0   0  89   3  49   7]
+	[  0   0   0   1   0   0   0  13  17  46  24]
+	[  0   0   0   0   1   0   0 100   6  41  37]
+	[  0   0   0   0   0   1   0 105  82  57 112]
+	[  0   0   0   0   0   0   1  46 104  49  47]
+	***/
+	vector<IntegerMod> v7;
+	v7.push_back(IntegerMod(6, p, m));
+	v7.push_back(IntegerMod(54, p, m));
+	v7.push_back(IntegerMod(58, p, m));
+	v7.push_back(IntegerMod(80, p, m));
+	v7.push_back(IntegerMod(63, p, m));
+	v7.push_back(IntegerMod(121, p, m));
+	v7.push_back(IntegerMod(34, p, m));
+	v7.push_back(IntegerMod(124, p, m));
+	v7.push_back(IntegerMod(124, p, m));
+	v7.push_back(IntegerMod(60, p, m));
+	v7.push_back(IntegerMod(30, p, m));
+	/***
+	[  1   0   0   0   0   0   0   0 110  40  17]
+	[  0   1   0   0   0   0   0   0  50  62   8]
+	[  0   0   1   0   0   0   0   0   6  97  50]
+	[  0   0   0   1   0   0   0   0  68 112   5]
+	[  0   0   0   0   1   0   0   0  81 116 112]
+	[  0   0   0   0   0   1   0   0  42  42 122]
+	[  0   0   0   0   0   0   1   0 121  71 124]
+	[  0   0   0   0   0   0   0   1  73  43  88]
+	***/
+	vector<IntegerMod> v8;
+	v8.push_back(IntegerMod(47, p, m));
+	v8.push_back(IntegerMod(44, p, m));
+	v8.push_back(IntegerMod(92, p, m));
+	v8.push_back(IntegerMod(2, p, m));
+	v8.push_back(IntegerMod(38, p, m));
+	v8.push_back(IntegerMod(23, p, m));
+	v8.push_back(IntegerMod(32, p, m));
+	v8.push_back(IntegerMod(8, p, m));
+	v8.push_back(IntegerMod(75, p, m));
+	v8.push_back(IntegerMod(117, p, m));
+	v8.push_back(IntegerMod(27, p, m));
+	/***
+	[  1   0   0   0   0   0   0   0   0 110  82]
+	[  0   1   0   0   0   0   0   0   0  37  83]
+	[  0   0   1   0   0   0   0   0   0  69  24]
+	[  0   0   0   1   0   0   0   0   0   3   2]
+	[  0   0   0   0   1   0   0   0   0 113  11]
+	[  0   0   0   0   0   1   0   0   0  96  65]
+	[  0   0   0   0   0   0   1   0   0  48  58]
+	[  0   0   0   0   0   0   0   1   0 119 105]
+	[  0   0   0   0   0   0   0   0   1  88  46]
+	***/
+	vector<IntegerMod> v9;
+	v9.push_back(IntegerMod(35, p, m));
+	v9.push_back(IntegerMod(33, p, m));
+	v9.push_back(IntegerMod(115, p, m));
+	v9.push_back(IntegerMod(56, p, m));
+	v9.push_back(IntegerMod(65, p, m));
+	v9.push_back(IntegerMod(7, p, m));
+	v9.push_back(IntegerMod(59, p, m));
+	v9.push_back(IntegerMod(91, p, m));
+	v9.push_back(IntegerMod(61, p, m));
+	v9.push_back(IntegerMod(124, p, m));
+	v9.push_back(IntegerMod(53, p, m));
+	/***
+	[  1   0   0   0   0   0   0   0   0   0 122]
+	[  0   1   0   0   0   0   0   0   0   0  26]
+	[  0   0   1   0   0   0   0   0   0   0  90]
+	[  0   0   0   1   0   0   0   0   0   0 119]
+	[  0   0   0   0   1   0   0   0   0   0  43]
+	[  0   0   0   0   0   1   0   0   0   0  59]
+	[  0   0   0   0   0   0   1   0   0   0  55]
+	[  0   0   0   0   0   0   0   1   0   0 121]
+	[  0   0   0   0   0   0   0   0   1   0 103]
+	[  0   0   0   0   0   0   0   0   0   1  86]
+	***/
+	vector<IntegerMod> v10;
+	v10.push_back(IntegerMod(10, p, m));
+	v10.push_back(IntegerMod(53, p, m));
+	v10.push_back(IntegerMod(120, p, m));
+	v10.push_back(IntegerMod(83, p, m));
+	v10.push_back(IntegerMod(105, p, m));
+	v10.push_back(IntegerMod(45, p, m));
+	v10.push_back(IntegerMod(106, p, m));
+	v10.push_back(IntegerMod(118, p, m));
+	v10.push_back(IntegerMod(33, p, m));
+	v10.push_back(IntegerMod(35, p, m));
+	v10.push_back(IntegerMod(95, p, m));
+	/***
+	[1 0 0 0 0 0 0 0 0 0 0]
+	[0 1 0 0 0 0 0 0 0 0 0]
+	[0 0 1 0 0 0 0 0 0 0 0]
+	[0 0 0 1 0 0 0 0 0 0 0]
+	[0 0 0 0 1 0 0 0 0 0 0]
+	[0 0 0 0 0 1 0 0 0 0 0]
+	[0 0 0 0 0 0 1 0 0 0 0]
+	[0 0 0 0 0 0 0 1 0 0 0]
+	[0 0 0 0 0 0 0 0 1 0 0]
+	[0 0 0 0 0 0 0 0 0 1 0]
+	[0 0 0 0 0 0 0 0 0 0 1]
+	***/
+	
+	hnf_add_row(A, v0, pivots, p, m);
+	hnf_add_row(A, v1, pivots, p, m);
+	hnf_add_row(A, v2, pivots, p, m);
+	hnf_add_row(A, v3, pivots, p, m);
+	hnf_add_row(A, v4, pivots, p, m);
+	hnf_add_row(A, v5, pivots, p, m);
+	hnf_add_row(A, v6, pivots, p, m);
+	hnf_add_row(A, v7, pivots, p, m);
+	hnf_add_row(A, v8, pivots, p, m);
+	hnf_add_row(A, v9, pivots, p, m);
+	hnf_add_row(A, v10, pivots, p, m);
+	print_mat(A);

@@ -1,0 +1,1 @@
+./test p=7 m=4 l=29 start=350 scount=400 w=0 mod=48 cong=32 & ./test p=7 m=4 l=29 start=350 scount=400 w=0 mod=48 cong=34 & ./test p=7 m=4 l=29 start=350 scount=400 w=0 mod=48 cong=36 & ./test p=7 m=4 l=29 start=350 scount=400 w=0 mod=48 cong=38
